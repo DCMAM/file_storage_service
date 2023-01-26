@@ -27,7 +27,7 @@ type fileProvicer interface {
 	//
 	// Return nil error when succeed.
 	// Otherwise, will return non-nil error.
-	UploadFile(file multipart.File) error
+	UploadFile(file multipart.File, name string) error
 }
 
 // Handler represents all the needed usecase for users

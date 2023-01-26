@@ -57,11 +57,18 @@ func (a Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// set token yang ke cookie
+	// set token to cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Path:     "/",
 		Value:    resp.Token,
+		HttpOnly: true,
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "username",
+		Path:     "/",
+		Value:    username,
 		HttpOnly: true,
 	})
 

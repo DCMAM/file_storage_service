@@ -67,15 +67,15 @@ func (mr *MockfileProvicerMockRecorder) GetAllFiles() *gomock.Call {
 }
 
 // UploadFile mocks base method.
-func (m *MockfileProvicer) UploadFile(file multipart.File) error {
+func (m *MockfileProvicer) UploadFile(file multipart.File, name string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UploadFile", file)
+	ret := m.ctrl.Call(m, "UploadFile", file, name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // UploadFile indicates an expected call of UploadFile.
-func (mr *MockfileProvicerMockRecorder) UploadFile(file interface{}) *gomock.Call {
+func (mr *MockfileProvicerMockRecorder) UploadFile(file, name interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockfileProvicer)(nil).UploadFile), file)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UploadFile", reflect.TypeOf((*MockfileProvicer)(nil).UploadFile), file, name)
 }

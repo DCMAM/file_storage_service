@@ -105,7 +105,10 @@ func (a Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = a.file.UploadFile(file)
+	httpCookie, _ := r.Cookie("username")
+	username := httpCookie.Value
+
+	err = a.file.UploadFile(file, username)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)

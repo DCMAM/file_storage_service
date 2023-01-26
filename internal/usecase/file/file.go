@@ -48,7 +48,7 @@ func (usecase Usecase) GetAllFiles() ([]models.File, error) {
 //
 // Return nil error when succeed.
 // Otherwise, will return non-nil error.
-func (usecase Usecase) UploadFile(file multipart.File) error {
+func (usecase Usecase) UploadFile(file multipart.File, username string) error {
 	// TODO: span the context
 
 	uuid := make([]byte, 16)
@@ -74,7 +74,7 @@ func (usecase Usecase) UploadFile(file multipart.File) error {
 	}
 
 	// TODO: remove this harcoded username
-	err = usecase.fileDB.SetFile(fileLocation, "david123")
+	err = usecase.fileDB.SetFile(fileLocation, username)
 	if err != nil {
 		log.Println(err)
 		return err

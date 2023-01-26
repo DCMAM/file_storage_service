@@ -129,7 +129,8 @@ func TestUseCase_GetAllFiles(t *testing.T) {
 
 func TestUseCase_UploadFile(t *testing.T) {
 	type args struct {
-		file multipart.File
+		file     multipart.File
+		username string
 	}
 
 	// TODO: find a way to mock file in parameter
@@ -150,19 +151,23 @@ func TestUseCase_UploadFile(t *testing.T) {
 		},
 		{
 			name: "got_errow_when_set_file",
-			args: args{},
+			args: args{
+				username: "name of user",
+			},
 			mock: func(mockRepoProvider *MockfileDBProvider, mockFilerepoProvider *MockfileProvider) {
 				mockFilerepoProvider.EXPECT().UploadFile(gomock.Any(), gomock.Any()).Return(nil)
-				mockRepoProvider.EXPECT().SetFile(gomock.Any(), gomock.Any()).Return(assert.AnError)
+				mockRepoProvider.EXPECT().SetFile(gomock.Any(), "name of user").Return(assert.AnError)
 			},
 			wantErr: assert.AnError,
 		},
 		{
 			name: "success",
-			args: args{},
+			args: args{
+				username: "name of user",
+			},
 			mock: func(mockRepoProvider *MockfileDBProvider, mockFilerepoProvider *MockfileProvider) {
 				mockFilerepoProvider.EXPECT().UploadFile(gomock.Any(), gomock.Any()).Return(nil)
-				mockRepoProvider.EXPECT().SetFile(gomock.Any(), gomock.Any()).Return(nil)
+				mockRepoProvider.EXPECT().SetFile(gomock.Any(), "name of user").Return(nil)
 			},
 			wantErr: nil,
 		},
@@ -182,7 +187,7 @@ func TestUseCase_UploadFile(t *testing.T) {
 				file:   mockfileProvider,
 			}
 
-			gotError := uc.UploadFile(test.args.file)
+			gotError := uc.UploadFile(test.args.file, test.args.username)
 			assert.Equal(t, test.wantErr, gotError)
 		})
 	}
