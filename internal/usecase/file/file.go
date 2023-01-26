@@ -19,7 +19,15 @@ import (
 func (usecase Usecase) DonwloadFile(path string) (*os.File, error) {
 	// TODO: span the context
 
-	f, err := usecase.file.DonwloadFile(path)
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	fileLocation := filepath.Join(dir, "files", path)
+
+	f, err := usecase.file.DonwloadFile(fileLocation)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -74,7 +82,7 @@ func (usecase Usecase) UploadFile(file multipart.File, username string) error {
 	}
 
 	// TODO: remove this harcoded username
-	err = usecase.fileDB.SetFile(fileLocation, username)
+	err = usecase.fileDB.SetFile(filename, username)
 	if err != nil {
 		log.Println(err)
 		return err

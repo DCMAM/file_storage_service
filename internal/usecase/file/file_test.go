@@ -2,8 +2,10 @@ package file
 
 import (
 	"file_storage_service/internal/models"
+
 	"mime/multipart"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -11,7 +13,11 @@ import (
 )
 
 func TestUseCase_DownloadFile(t *testing.T) {
-	mockFile, _ := os.Open("/test/123")
+	mockFile, _ := os.Open("test/123")
+
+	dir, _ := os.Getwd()
+
+	mockFileLocation := filepath.Join(dir, "files", "test/123")
 
 	type args struct {
 		path string
@@ -30,7 +36,7 @@ func TestUseCase_DownloadFile(t *testing.T) {
 				path: "test/123",
 			},
 			mock: func(mockRepoProvider *MockfileDBProvider, mockFilerepoProvider *MockfileProvider) {
-				mockFilerepoProvider.EXPECT().DonwloadFile("test/123").Return(mockFile, assert.AnError)
+				mockFilerepoProvider.EXPECT().DonwloadFile(mockFileLocation).Return(mockFile, assert.AnError)
 			},
 			want:    mockFile,
 			wantErr: assert.AnError,
@@ -41,7 +47,7 @@ func TestUseCase_DownloadFile(t *testing.T) {
 				path: "test/123",
 			},
 			mock: func(mockRepoProvider *MockfileDBProvider, mockFilerepoProvider *MockfileProvider) {
-				mockFilerepoProvider.EXPECT().DonwloadFile("test/123").Return(mockFile, nil)
+				mockFilerepoProvider.EXPECT().DonwloadFile(mockFileLocation).Return(mockFile, nil)
 			},
 			want:    mockFile,
 			wantErr: nil,
