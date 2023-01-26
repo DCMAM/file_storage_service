@@ -2,13 +2,68 @@ package file
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 const (
+	// max size
 	uploadDocumentMaxMemory = 5242880 // 5 << 20
+
+	// error message
+	errInvalidBody = "invalid body"
+	errEmptyPath   = "path is required"
 )
+
+// DonwloadFile will handle the download file request based on the given writer and request.
+func (h Handler) DonwloadFile(w http.ResponseWriter, r *http.Request) {
+	var (
+		err error
+	)
+
+	body, _ := ioutil.ReadAll(r.Body)
+
+	type filePath struct {
+		Path string `json:"path"`
+	}
+
+	var path filePath
+
+	err = json.Unmarshal(body, &path)
+	if err != nil {
+		fmt.Println(err)
+		_, _ = w.Write([]byte(errInvalidBody))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if path.Path == "" {
+		_, _ = w.Write([]byte(errEmptyPath))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	f, err := h.file.DonwloadFile(path.Path)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if f != nil {
+		defer f.Close()
+	}
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", f.Name()))
+
+	_, err = io.Copy(w, f)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
 
 // GetAllFiles will handle the get all files request based on the given writer and request.
 func (a Handler) GetAllFiles(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +86,7 @@ func (a Handler) GetAllFiles(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(body)
 }
 
-// v will handle the upload file request based on the given writer and request.
+// UploadFile will handle the upload file request based on the given writer and request.
 func (a Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 	var (
 		err error

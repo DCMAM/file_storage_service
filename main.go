@@ -70,7 +70,7 @@ func main() {
 	// for public API
 	// TODO: make another handler function
 	publicFile := r.PathPrefix("/ex/file").Subrouter()
-	publicFile.HandleFunc("/download", fileHandler.GetAllFiles).Methods("GET")
+	publicFile.HandleFunc("/download", fileHandler.DonwloadFile).Methods("GET")
 
 	fmt.Println("Running..")
 	fmt.Println(http.ListenAndServe(":"+config.GetString("app.port"), r))

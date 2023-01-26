@@ -7,6 +7,7 @@ package file
 import (
 	models "file_storage_service/internal/models"
 	multipart "mime/multipart"
+	os "os"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -33,6 +34,21 @@ func NewMockfileProvider(ctrl *gomock.Controller) *MockfileProvider {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockfileProvider) EXPECT() *MockfileProviderMockRecorder {
 	return m.recorder
+}
+
+// DonwloadFile mocks base method.
+func (m *MockfileProvider) DonwloadFile(path string) (*os.File, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DonwloadFile", path)
+	ret0, _ := ret[0].(*os.File)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DonwloadFile indicates an expected call of DonwloadFile.
+func (mr *MockfileProviderMockRecorder) DonwloadFile(path interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DonwloadFile", reflect.TypeOf((*MockfileProvider)(nil).DonwloadFile), path)
 }
 
 // UploadFile mocks base method.

@@ -2,6 +2,7 @@ package file
 
 import (
 	"file_storage_service/internal/models"
+	"os"
 
 	"mime/multipart"
 )
@@ -10,6 +11,12 @@ import (
 
 // fileProvicer provides file usecase's methods for user handler
 type fileProvicer interface {
+	// DonwloadFile will download file based on the path parameter
+	//
+	// Return nil error when succeed.
+	// Otherwise, will return non-nil error.
+	DonwloadFile(path string) (*os.File, error)
+
 	// GetAllFiles will get all the files in Database
 	//
 	// Return list of models.File and nil error when succeed.

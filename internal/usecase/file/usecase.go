@@ -3,12 +3,19 @@ package file
 import (
 	"file_storage_service/internal/models"
 	"mime/multipart"
+	"os"
 )
 
 //go:generate mockgen -source=./usecase.go -destination=./usecase_mock.go -package=file
 
 // fileProvider provides repository's methods for file usecase in local storage repo
 type fileProvider interface {
+	// DonwloadFile will download file based on the path parameter
+	//
+	// Return nil error when succeed.
+	// Otherwise, will return non-nil error.
+	DonwloadFile(path string) (*os.File, error)
+
 	// UploadFile will will upload file and save it to local storage
 	//
 	// Return nil error when succeed.

@@ -1,15 +1,87 @@
 package file
 
 import (
-	"file_storage_service/internal/models"
+	"bytes"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
+
+	"file_storage_service/internal/models"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
+
+func Test_DownloadFile(t *testing.T) {
+	mockFile, _ := os.Open("/test/123")
+
+	type mockFields struct {
+		fileUsecase *MockfileProvicer
+	}
+	type args struct {
+		body io.Reader
+	}
+	tests := []struct {
+		name       string
+		args       args
+		mock       func(mockFields)
+		expResp    interface{}
+		expCode    int
+		expMessage string
+	}{
+		{
+			name: "invalid_JSON_body",
+			args: args{
+				body: bytes.NewBuffer([]byte(`{
+					"path": "/test/123"
+				`)),
+			},
+			mock: func(m mockFields) {},
+		},
+		{
+			name: "empty_path_request",
+			args: args{
+				body: bytes.NewBuffer([]byte(`{
+					"path": ""
+				}`)),
+			},
+			mock: func(m mockFields) {},
+		},
+		{
+			name: "error_when_calling_usecase",
+			args: args{
+				body: bytes.NewBuffer([]byte(`{
+					"path": "test/123"
+				}`)),
+			},
+			mock: func(m mockFields) {
+				m.fileUsecase.EXPECT().DonwloadFile("test/123").Return(mockFile, assert.AnError)
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockFields := mockFields{
+				fileUsecase: NewMockfileProvicer(ctrl),
+			}
+			test.mock(mockFields)
+
+			controller := &Handler{
+				file: mockFields.fileUsecase,
+			}
+
+			mockWriter := httptest.NewRecorder()
+			mockRequest, _ := http.NewRequest("GET", "/file/", test.args.body)
+
+			controller.DonwloadFile(mockWriter, mockRequest)
+		})
+	}
+}
 
 func Test_GetAllFiles(t *testing.T) {
 	type mockFields struct {

@@ -12,6 +12,22 @@ import (
 	"file_storage_service/internal/models"
 )
 
+// DonwloadFile will download file based on the path parameter
+//
+// Return nil error when succeed.
+// Otherwise, will return non-nil error.
+func (usecase Usecase) DonwloadFile(path string) (*os.File, error) {
+	// TODO: span the context
+
+	f, err := usecase.file.DonwloadFile(path)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return f, nil
+}
+
 // GetAllFiles will get all the files in Database
 //
 // Return list of models.File and nil error when succeed.
