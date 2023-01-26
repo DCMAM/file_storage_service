@@ -81,7 +81,7 @@ func (a Handler) GetAllFiles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	handler.Response(w, resp, http.StatusBadRequest)
+	handler.Response(w, resp, http.StatusOK)
 }
 
 // UploadFile will handle the upload file request based on the given writer and request.
@@ -114,5 +114,5 @@ func (a Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	handler.Response(w, "success", http.StatusInternalServerError)
+	handler.Response(w, "success", http.StatusOK)
 }
