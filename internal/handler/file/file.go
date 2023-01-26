@@ -2,6 +2,8 @@ package file
 
 import (
 	"encoding/json"
+	"errors"
+	"file_storage_service/internal/handler"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,6 +18,7 @@ const (
 	// error message
 	errInvalidBody = "invalid body"
 	errEmptyPath   = "path is required"
+	errMaxSize     = "file is too large"
 )
 
 // DonwloadFile will handle the download file request based on the given writer and request.
@@ -34,22 +37,22 @@ func (h Handler) DonwloadFile(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(body, &path)
 	if err != nil {
-		fmt.Println(err)
-		_, _ = w.Write([]byte(errInvalidBody))
-		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("empty password - HNDL.DF00 - %s\n", err.Error())
+		handler.Response(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if path.Path == "" {
-		_, _ = w.Write([]byte(errEmptyPath))
-		w.WriteHeader(http.StatusBadRequest)
+		err := errors.New(errEmptyPath)
+		log.Printf("empty path - HNDL.DF01 - %s\n", err.Error())
+		handler.Response(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	f, err := h.file.DonwloadFile(path.Path)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("h.file.DonwloadFile() - HNDL.DF02 - %s\n", err.Error())
+		handler.Response(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if f != nil {
@@ -73,17 +76,12 @@ func (a Handler) GetAllFiles(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := a.file.GetAllFiles()
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("empty password - HNDL.GAF00 - %s\n", err.Error())
+		handler.Response(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	body, _ := json.Marshal(map[string]interface{}{
-		"message": "success",
-		"code":    200,
-		"body":    resp,
-	})
-	_, _ = w.Write(body)
+	handler.Response(w, resp, http.StatusBadRequest)
 }
 
 // UploadFile will handle the upload file request based on the given writer and request.
@@ -94,14 +92,15 @@ func (a Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 
 	file, fileHeader, err := r.FormFile("file")
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
+		log.Printf("empty password - HNDL.UF00 - %s\n", err.Error())
+		handler.Response(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if fileHeader.Size > (uploadDocumentMaxMemory) {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
+		err := errors.New(errMaxSize)
+		log.Printf("empty password - HNDL.UF01 - %s\n", err.Error())
+		handler.Response(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -110,14 +109,10 @@ func (a Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 
 	err = a.file.UploadFile(file, username)
 	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("empty password - HNDL.R02 - %s\n", err.Error())
+		handler.Response(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	body, _ := json.Marshal(map[string]interface{}{
-		"message": "success",
-		"code":    200,
-	})
-	_, _ = w.Write(body)
+	handler.Response(w, "success", http.StatusInternalServerError)
 }

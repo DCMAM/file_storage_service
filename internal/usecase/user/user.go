@@ -46,6 +46,7 @@ func (usecase Usecase) Login(username string, password string) (models.User, err
 		return models.User{}, err
 	}
 
+	resp.Password = ""
 	return resp, nil
 }
 
